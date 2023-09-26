@@ -1,0 +1,93 @@
+<template>
+  <div id="app">
+    <div id="chart-containner" v-for="(record, index) in  formattedRecords" :key="index"> <org-chart :records="record"></org-chart></div>
+  </div>
+</template>
+
+<script>
+import OrgChart from './components/OrgChart.vue';
+import recordsData from '../data/records.json';
+
+export default {
+  components: {
+    'org-chart': OrgChart,
+  },
+  data() {
+    return {
+      formattedRecords: [],
+    };
+  },
+  created: function () {
+      this.formattedRecords = this.transformObject(recordsData);
+  },
+  methods: {
+  requiredFormat: function (data) {
+    const result = {
+      id: data.type.id,
+      name: data.name,
+      title: data.type.name,
+      avatar: data.type.image,
+      children: [],
+    };
+
+    if (data.accesses && data.accesses.length > 0) {
+      // Separate children into groups based on role
+      const childrenByRole = {};
+
+      data.accesses.forEach((access) => {
+        const child = {
+          name: access.user.name,
+          title: access.role.name,
+          avatar: access.user.image,
+          id: access.user.id,
+        };
+
+        if (!childrenByRole[access.role.name]) {
+          childrenByRole[access.role.name] = [];
+        }
+
+        childrenByRole[access.role.name].push(child);
+      });
+
+      // Create an array for "PROVIDER_LEVEL_ADMIN" children
+      const adminChildren = childrenByRole['PROVIDER_LEVEL_ADMIN'] || [];
+
+      // Create an array for other role children
+      const otherChildren = Object.keys(childrenByRole)
+        .filter((role) => role !== 'PROVIDER_LEVEL_ADMIN')
+        .reduce((acc, role) => acc.concat(childrenByRole[role]), []);
+
+      // Check if there are "PROVIDER_LEVEL_ADMIN" nodes
+      if (adminChildren.length > 0) {
+        adminChildren.forEach((admin) => {
+          result.children.push({
+            name: admin.name,
+            title: 'PROVIDER_LEVEL_ADMIN',
+            avatar: admin.avatar,
+            id: admin.id,
+            children: [...otherChildren],
+          });
+        });
+      } else {
+        // If no "PROVIDER_LEVEL_ADMIN" nodes, add other role children directly
+        result.children = otherChildren;
+      }
+    }
+
+    return result;
+  },
+  transformObject: function (arr) {
+    return arr.map((item) => this.requiredFormat(item));
+  },
+},
+  // computed: {
+  //     records() {
+  //   return JSON.stringify(this.formattedRecords, null, 2);
+  // },
+  // },
+};
+</script>
+
+<style>
+/* Add global CSS styles here if needed */
+</style>

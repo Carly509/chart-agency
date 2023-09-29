@@ -23,6 +23,12 @@
        const divElements = document.querySelectorAll('.node');
 
         divElements.forEach(divElement => {
+          // const titleDiv = divElement.querySelector('.title');
+          // const imgElement = document.createElement('img');
+          // imgElement.src = this.records.avatar;
+          // imgElement.style.width = '13px';
+          // titleDiv.appendChild(imgElement);
+
           const contentElement = divElement.querySelector('.content');
             if (contentElement && contentElement.textContent.trim() === 'PROVIDER_LEVEL_2') {
             const titleElement = divElement.querySelector('.title');
@@ -42,16 +48,13 @@
         }
         });
      });
-        const titleDiv = this.$el.querySelector('.title');
-        const imgElement = document.createElement('img');
-        imgElement.src = this.records.avatar;
-        imgElement.style.width = '13px';
-        titleDiv.appendChild(imgElement);
-            }
+     },
+  //     created() {
+  //   console.log('This is a log message', this.records.avatar);
+  // }
         };
   </script>
 
   <style scoped>
   /* Add CSS styles for node content and conditional styling here */
-
   </style>

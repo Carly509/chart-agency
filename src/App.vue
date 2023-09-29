@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="chart-containner" v-for="(record, index) in  formattedRecords" :key="index"> <org-chart :records="record"></org-chart></div>
+    <div id="chart-containner"> <org-chart :records="records"></org-chart></div>
   </div>
 </template>
 
@@ -80,11 +80,11 @@ export default {
     return arr.map((item) => this.requiredFormat(item));
   },
 },
-  // computed: {
-  //     records() {
-  //   return JSON.stringify(this.formattedRecords, null, 2);
-  // },
-  // },
+  computed: {
+      records() {
+    return {'id': 0, children: this.formattedRecords};
+  },
+  },
 };
 </script>
 

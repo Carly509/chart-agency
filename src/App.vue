@@ -49,10 +49,8 @@ export default {
         childrenByRole[access.role.name].push(child);
       });
 
-      // Create an array for "PROVIDER_LEVEL_ADMIN" children
       const adminChildren = childrenByRole['PROVIDER_LEVEL_ADMIN'] || [];
 
-      // Create an array for other role children
       const otherChildren = Object.keys(childrenByRole)
         .filter((role) => role !== 'PROVIDER_LEVEL_ADMIN')
         .reduce((acc, role) => acc.concat(childrenByRole[role]), []);
@@ -69,7 +67,6 @@ export default {
           });
         });
       } else {
-        // If no "PROVIDER_LEVEL_ADMIN" nodes, add other role children directly
         result.children = otherChildren;
       }
     }

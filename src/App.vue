@@ -21,58 +21,91 @@ export default {
       this.formattedRecords = this.transformObject(recordsData);
   },
   methods: {
-  requiredFormat: function (data) {
-    const result = {
-      id: data.type.id,
-      name: data.name,
-      title: data.type.name,
-      avatar: data.type.image,
-      children: [],
-    };
+    requiredFormat: function (data) {
 
-    if (data.accesses && data.accesses.length > 0) {
-      // Separate children into groups based on role
-      const childrenByRole = {};
+  const result = {
+    id: data.type.id,
+    name: data.name,
+    title: data.type.name,
+    avatar: data.type.image,
+    children: [],
+  };
 
-      data.accesses.forEach((access) => {
-        const child = {
-          name: access.user.name,
-          title: access.role.name,
-          avatar: access.user.image,
-          id: access.user.id,
-        };
+  if (data.accesses && data.accesses.length > 0) {
+    const childrenByRole = {};
 
-        if (!childrenByRole[access.role.name]) {
-          childrenByRole[access.role.name] = [];
-        }
+    data.accesses.forEach((access) => {
+      const child = {
+        name: access.user.name,
+        title: access.role.name,
+        avatar: access.user.image,
+        id: access.user.id,
+      };
 
-        childrenByRole[access.role.name].push(child);
-      });
+      if (!childrenByRole[access.role.name]) {
+        childrenByRole[access.role.name] = [];
+      }
 
-      const adminChildren = childrenByRole['PROVIDER_LEVEL_ADMIN'] || [];
+      childrenByRole[access.role.name].push(child);
+    });
 
-      const otherChildren = Object.keys(childrenByRole)
-        .filter((role) => role !== 'PROVIDER_LEVEL_ADMIN')
-        .reduce((acc, role) => acc.concat(childrenByRole[role]), []);
+    const adminChildren = childrenByRole['PROVIDER_LEVEL_ADMIN'] || [];
+    const level2Children = childrenByRole['PROVIDER_LEVEL_2'] || [];
 
-      // Check if there are "PROVIDER_LEVEL_ADMIN" nodes
-      if (adminChildren.length > 0) {
-        adminChildren.forEach((admin) => {
+    const level1Children = Object.keys(childrenByRole)
+      .filter((role) => role !== 'PROVIDER_LEVEL_ADMIN' && role !== 'PROVIDER_LEVEL_2')
+      .reduce((acc, role) => acc.concat(childrenByRole[role]), []);
+
+    if (adminChildren.length > 0) {
+      adminChildren.forEach((admin) => {
+        if (level2Children.length > 0) {
           result.children.push({
             name: admin.name,
             title: 'PROVIDER_LEVEL_ADMIN',
             avatar: admin.avatar,
             id: admin.id,
-            children: [...otherChildren],
+            children: [
+              {
+                name: 'PROVIDER_LEVEL_2',
+                title: 'PROVIDER_LEVEL_2',
+                avatar: null,
+                id: null,
+                children: [
+                  ...level2Children,
+                  ...level1Children,
+                ],
+              },
+            ],
           });
-        });
-      } else {
-        result.children = otherChildren;
-      }
+        } else {
+          result.children.push({
+            name: admin.name,
+            title: 'PROVIDER_LEVEL_ADMIN',
+            avatar: admin.avatar,
+            id: admin.id,
+            children: [
+              ...level1Children,
+            ],
+          });
+        }
+      });
+    } else if (level2Children.length > 0) {
+      result.children.push({
+        name: level2Children[0].name,
+        title: 'PROVIDER_LEVEL_2',
+        avatar: null,
+        id: null,
+        children: [
+          ...level1Children,
+        ],
+      });
+    } else {
+      result.children = level1Children;
     }
+  }
 
-    return result;
-  },
+  return result;
+},
   transformObject: function (arr) {
     return arr.map((item) => this.requiredFormat(item));
   },

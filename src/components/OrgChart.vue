@@ -1,22 +1,47 @@
 <template>
-    <div>
-      <organization-chart :datasource="records" id="chart-container"></organization-chart>
+  <div>
+   <div v-if="!showChild">
+      <organization-chart :datasource="records" id="chart-container" @node-click="handleNodeClick"></organization-chart>
     </div>
+    <ChildrenView v-if="showChild" :children-data="childrenData" @back="closeFunc"></ChildrenView >
+  </div>
   </template>
 
   <script>
   import OrganizationChart from 'vue-organization-chart';
   import 'vue-organization-chart/dist/orgchart.css';
+  import ChildrenView from './ChildChart.vue';
 
   export default {
     components: {
       OrganizationChart,
+      ChildrenView,
     },
     props: {
     records: {
       type: Object,
       required: true,
       },
+    },
+    data() {
+    return {
+      showChild: false,
+      childrenData: null
+    };
+  },
+    methods: {
+      handleNodeClick(nodeData) {
+        if (nodeData.title === 'CLIENT') {
+        this.showChild = true;
+        this.childrenData = nodeData.children[0];
+        } else {
+          console.log('Node clicked:', nodeData)
+        }
+      },
+      closeFunc() {
+      this.showChild = false;
+      this.childrenData = null;
+    }
     },
     mounted() {
      this.$nextTick(() => {

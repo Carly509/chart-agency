@@ -1,23 +1,28 @@
 <template>
-    <div>
-      <organization-chart :datasource="parent" id="chart-container"></organization-chart>
+    <div class="modal">
+      <button class="back-button" @click="goBack">&lt; Back</button>
+      <organization-chart :datasource="childrenData" id="chart-container"></organization-chart>
     </div>
   </template>
 
   <script>
   import OrganizationChart from 'vue-organization-chart';
-  import 'vue-organization-chart/dist/orgchart.css';
 
   export default {
     components: {
-      OrganizationChart,
+        OrganizationChart,
     },
-    parent: {
-    records: {
+    props: {
+    childrenData: {
       type: Object,
       required: true,
       },
     },
+    methods: {
+    goBack() {
+      this.$emit('back');
+    }
+  },
     mounted() {
      this.$nextTick(() => {
        const divElements = document.querySelectorAll('.node');
@@ -47,6 +52,6 @@
         };
   </script>
 
-  <style scoped>
-  /* Add CSS styles for node content and conditional styling here */
-  </style>
+<style scoped>
+/* Add necessary styling */
+</style>

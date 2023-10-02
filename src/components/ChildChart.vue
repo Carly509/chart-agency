@@ -1,7 +1,8 @@
 <template>
-    <div class="modal">
+    <div>
       <button class="back-button" @click="goBack">&lt; Back</button>
-      <organization-chart :datasource="childrenData" id="chart-container"></organization-chart>
+      <organization-chart v-if="typeof childrenData !== 'undefined'" :datasource="childrenData" id="chart-container"></organization-chart>
+      <p v-else>No data available</p>
     </div>
   </template>
 

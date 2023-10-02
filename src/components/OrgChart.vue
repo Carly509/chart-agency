@@ -1,7 +1,8 @@
 <template>
   <div>
    <div v-if="!showChild">
-      <organization-chart :datasource="records" id="chart-container" @node-click="handleNodeClick"></organization-chart>
+      <h1>Click On Client To See Provider</h1>
+      <organization-chart :datasource="modifiedRecords" id="chart-container" @node-click="handleNodeClick"></organization-chart>
     </div>
     <ChildrenView v-if="showChild" :children-data="childrenData" @back="closeFunc"></ChildrenView >
   </div>
@@ -26,17 +27,21 @@
     data() {
     return {
       showChild: false,
-      childrenData: null
+      childrenData: null,
+      clientData: null,
     };
   },
     methods: {
       handleNodeClick(nodeData) {
-        if (nodeData.title === 'CLIENT') {
+        if (nodeData) {
         this.showChild = true;
-        this.childrenData = nodeData.children[0];
-        } else {
-          console.log('Node clicked:', nodeData)
-        }
+        const record = this.records.find(record => record.name === nodeData.name);
+          if (record) {
+            this.childrenData = record.children[0];
+          }
+         } // else {
+        //   console.log('Node clicked:', nodeData)
+        // }
       },
       closeFunc() {
       this.showChild = false;
@@ -74,6 +79,16 @@
         });
      });
      },
+  computed: {
+    //display only client level
+    modifiedRecords() {
+      const newObjects = this.records.map(obj => {
+      const { id, name, title } = obj;
+      return { id, name, title };
+    });
+    return { children: newObjects};
+    },
+  },
   //     created() {
   //   console.log('This is a log message', this.records.avatar);
   // }

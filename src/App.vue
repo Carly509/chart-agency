@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="chart-containner"> <org-chart :records="records"></org-chart></div>
+    <div id="chart-containner"> <org-chart :records="formattedRecords"></org-chart></div>
   </div>
 </template>
 
@@ -112,7 +112,7 @@ export default {
 },
   computed: {
       records() {
-    return {'id': 0, children: this.formattedRecords};
+    return { children: this.formattedRecords};
   },
   },
 };
